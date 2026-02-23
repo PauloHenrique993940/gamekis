@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGame } from '../services/GameContext';
 import { saveScore } from '../services/api';
 import confetti from 'canvas-confetti';
-import { Trophy, Star, Shield, Share2, ArrowRight, Award, TrophyIcon } from 'lucide-react';
+import { Shield, ArrowRight } from 'lucide-react';
 
 const Result = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { player, setPlayer, currentLevel, setCurrentLevel } = useGame();
+  const { player, setPlayer, setCurrentLevel } = useGame();
   const { score, total, level, levelName } = location.state || { score: 0, total: 10, level: 1, levelName: 'Dev' };
 
   const percentage = Math.round((score / total) * 100);

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../services/GameContext';
 import { registerPlayer } from '../services/api';
-import { User, Shield, Zap, Terminal, CheckCircle2 } from 'lucide-react';
+import { User, Shield, Terminal, CheckCircle2 } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();

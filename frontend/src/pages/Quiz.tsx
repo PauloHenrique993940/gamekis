@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../services/GameContext';
 import { getQuestions } from '../services/api';
-import { CheckCircle, XCircle, ChevronRight, HelpCircle, Shield, Award } from 'lucide-react';
+import { CheckCircle, XCircle, ChevronRight, HelpCircle, Shield } from 'lucide-react';
 import BlackHoleBackground from '../components/BlackHoleBackground';
 
 interface Question {
@@ -16,7 +16,7 @@ interface Question {
 
 const Quiz = () => {
   const navigate = useNavigate();
-  const { player, currentLevel, setCurrentLevel } = useGame();
+  const { player, currentLevel } = useGame();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);

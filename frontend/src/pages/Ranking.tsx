@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getRanking } from '../services/api';
-import { Trophy, ArrowLeft, Shield, Award, User, Star } from 'lucide-react';
+import { Trophy, ArrowLeft, Award, User, Star } from 'lucide-react';
 
 interface Player {
   id: string;
