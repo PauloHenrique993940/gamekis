@@ -1,0 +1,113 @@
+.login-btn-main {
+  width: 100%;
+  height: 60px;
+  font-size: 1.3rem;
+}
+/* LoginPage.css - estilos para tela de login GameKis */
+.login-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: transparent;
+}
+.login-card {
+  width: 100%;
+  max-width: 550px;
+  position: relative;
+  border: 1px solid var(--accent);
+  background: rgba(18, 18, 18, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+}
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.login-header-icon {
+  display: inline-block;
+  padding: 15px;
+  background: var(--primary);
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 20px var(--primary);
+}
+.login-title {
+  font-size: 2.5rem;
+  color: white;
+  letter-spacing: 2px;
+}
+.login-subtitle {
+  color: var(--accent);
+  font-weight: bold;
+}
+.login-howto {
+  background: rgba(255,255,255,0.05);
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+.login-howto-title {
+  color: white;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.login-howto-list {
+  list-style: none;
+  padding: 0;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.login-howto-list li {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+}
+.login-input-group {
+  margin-bottom: 1.5rem;
+}
+.login-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: bold;
+}
+.login-input-wrapper {
+  position: relative;
+}
+.login-input {
+  width: 100%;
+  padding: 15px 15px 15px 45px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 1.1rem;
+  outline: none;
+}
+.login-input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent);
+}
+.login-error {
+  color: var(--primary);
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: bold;
+}
+.login-progress {
+  margin-top: 1rem;
+  text-align: center;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.85rem;
+}
