@@ -55,9 +55,9 @@ const Result = () => {
   };
 
   const getBadgeImage = (lvl: number) => {
-    if (lvl === 1) return '/src/assets/insignias/insignia1.png';
-    if (lvl === 2) return '/src/assets/insignias/insiginia2.png';
-    return '/src/assets/insignias/insignia1.png'; // Fallback
+    if (lvl === 1) return '/insignias/insignia1.png';
+    if (lvl === 2) return '/insignias/insignia2.png';
+    return '/insignias/insignia1.png'; // Fallback
   };
 
   const downloadInsignia = () => {

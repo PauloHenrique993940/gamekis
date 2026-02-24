@@ -42,7 +42,9 @@ const Login = () => {
       localStorage.removeItem('gamekis_player_name');
       navigate('/quiz');
     } catch (err: any) {
-      setError('Erro ao iniciar missão. Verifique sua conexão.');
+      console.error('Erro detalhado no login:', err);
+      const msg = err.response?.data?.error || 'Erro ao conectar ao servidor (verifique se o backend está rodando na porta 3001).';
+      setError(msg);
     } finally {
       setLoading(false);
     }

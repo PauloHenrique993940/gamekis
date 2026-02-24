@@ -77,6 +77,14 @@ const Quiz = () => {
     </div>
   );
 
+  if (questions.length === 0) return (
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+      <h2>NENHUMA MISSÃO ENCONTRADA</h2>
+      <p style={{ color: 'white' }}>Verifique se o backend está rodando e contém perguntas para este nível.</p>
+      <button onClick={() => navigate('/login')} className="hero-btn" style={{ marginTop: '20px' }}>VOLTAR</button>
+    </div>
+  );
+
   const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
 
