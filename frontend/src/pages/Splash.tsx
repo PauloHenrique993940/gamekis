@@ -4,7 +4,7 @@ import { Shield, Zap, Cpu } from 'lucide-react';
 
 const Splash = () => {
   const navigate = useNavigate();
-  const [show, setShow] = useState(true);
+  const [show] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
