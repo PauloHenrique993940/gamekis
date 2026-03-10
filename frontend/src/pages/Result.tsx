@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useGame } from '../services/GameContext';
 import { saveScore } from '../services/api';
 import confetti from 'canvas-confetti';
-import { Shield, ArrowRight, Download, Linkedin, Award, Trophy } from 'lucide-react';
+import { Shield, ArrowRight, Download, Linkedin, Award } from 'lucide-react';
 
 // Importando a imagem do guerreiro da pasta assets para exibição
 import guerreiro1 from '../assets/guerreiro1.png';

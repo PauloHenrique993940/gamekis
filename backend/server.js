@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -8,6 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
+app.use(express.json());
 app.get('/status', async (req, res) => {
   try {
     const questionCount = await prisma.question.count();

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Zap, Terminal, Cpu } from 'lucide-react';
+import { Shield, Zap, Cpu } from 'lucide-react';
 
 const Splash = () => {
   const navigate = useNavigate();
