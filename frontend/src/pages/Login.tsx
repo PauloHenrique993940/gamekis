@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../services/GameContext';
-import { registerPlayer } from '../services/api';
-import { User, Shield, Terminal, CheckCircle2 } from 'lucide-react';
+import { registerPlayer, getStatus } from '../services/api';
+import { User, Shield, Terminal, CheckCircle2, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
 import '../styles/LoginPage.css';
 
 const Login = () => {
@@ -11,6 +11,26 @@ const Login = () => {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [dbInfo, setDbInfo] = useState({ questions: 0 });
+
+  // Verifica status do servidor ao carregar
+  useEffect(() => {
+    const checkServer = async () => {
+      try {
+        const data = await getStatus();
+        setServerStatus('online');
+        setDbInfo({ questions: data.questions });
+        if (data.questions === 0) {
+          setError('O banco de dados está vazio. Por favor, rode o seed.');
+        }
+      } catch (err) {
+        setServerStatus('offline');
+        setError('Servidor Offline. Verifique se o backend está rodando na porta 3001.');
+      }
+    };
+    checkServer();
+  }, []);
 
   // Preenche o nome salvo do localStorage ao iniciar
   useEffect(() => {
@@ -27,6 +47,16 @@ const Login = () => {
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (serverStatus === 'offline') {
+      setError('Não é possível iniciar: Servidor Offline.');
+      return;
+    }
+
+    if (dbInfo.questions === 0) {
+      setError('Não é possível iniciar: Não há perguntas no banco.');
+      return;
+    }
+
     if (!name.trim()) {
       setError('Diga-nos seu nome de herói!');
       return;
@@ -41,9 +71,10 @@ const Login = () => {
       // Limpa o nome salvo após login bem-sucedido
       localStorage.removeItem('gamekis_player_name');
       navigate('/quiz');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Erro detalhado no login:', err);
-      const msg = err.response?.data?.error || 'Erro ao conectar ao servidor (verifique se o backend está rodando na porta 3001).';
+      const error = err as { response?: { data?: { error?: string } } };
+      const msg = error.response?.data?.error || 'Erro ao conectar ao servidor.';
       setError(msg);
     } finally {
       setLoading(false);
@@ -59,6 +90,12 @@ const Login = () => {
           </div>
           <h1 className="login-title">BEM-VINDO AO GAMEKIS</h1>
           <p className="login-subtitle">Sua jornada Front-End começa aqui!</p>
+          
+          <div className={`server-badge ${serverStatus}`}>
+            {serverStatus === 'online' ? <Wifi size={14} /> : <WifiOff size={14} />}
+            {serverStatus === 'checking' ? 'VERIFICANDO SERVIDOR...' : 
+             serverStatus === 'online' ? 'SISTEMAS ONLINE' : 'SERVIDOR OFFLINE'}
+          </div>
         </div>
 
         <div className="login-howto">
@@ -77,7 +114,7 @@ const Login = () => {
             </li>
             <li>
               <CheckCircle2 size={18} color="var(--accent)" style={{ flexShrink: 0 }} />
-              <span>Seu progresso é <strong>salvo automaticamente</strong>. Pode fechar e voltar quando quiser!</span>
+              <span>Seu progresso é <strong>salvo automaticamente</strong>.</span>
             </li>
           </ul>
         </div>
@@ -92,28 +129,62 @@ const Login = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="login-input"
+                disabled={serverStatus === 'offline'}
               />
               <User size={22} className="login-input-icon" />
             </div>
           </div>
 
-          {error && <div className="login-error">{error}</div>}
+          {error && (
+            <div className="login-error" style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255, 70, 70, 0.1)', border: '1px solid rgba(255, 70, 70, 0.2)', color: '#ff4646', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '0.9rem' }}>
+              <AlertTriangle size={18} />
+              {error}
+            </div>
+          )}
 
           <button 
             type="submit" 
             className="hero-btn login-btn-main" 
-            disabled={loading}
+            disabled={loading || serverStatus === 'offline'}
           >
             {loading ? 'CONECTANDO...' : player ? 'CONTINUAR JORNADA' : 'ENTENDI, VAMOS JOGAR!'}
           </button>
         </form>
 
-        {player && (
+        {player && serverStatus === 'online' && (
           <div className="login-progress">
             Você parou na <strong>Fase {currentLevel}</strong>. Clique acima para retomar.
           </div>
         )}
       </div>
+      
+      <style>{`
+        .server-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 0.7rem;
+          font-weight: bold;
+          margin-top: 10px;
+          letter-spacing: 1px;
+        }
+        .server-badge.online {
+          background: rgba(0, 255, 136, 0.1);
+          color: #00ff88;
+          border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        .server-badge.offline {
+          background: rgba(255, 70, 70, 0.1);
+          color: #ff4646;
+          border: 1px solid rgba(255, 70, 70, 0.2);
+        }
+        .server-badge.checking {
+          background: rgba(255, 255, 255, 0.05);
+          color: rgba(255, 255, 255, 0.5);
+        }
+      `}</style>
     </div>
   );
 };

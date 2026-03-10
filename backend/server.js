@@ -8,7 +8,18 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.get('/status', async (req, res) => {
+  try {
+    const questionCount = await prisma.question.count();
+    res.json({ 
+      status: 'online', 
+      questions: questionCount,
+      database: 'connected'
+    });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: 'Erro ao acessar o banco de dados' });
+  }
+});
 
 // Rotas
 app.get('/questions', async (req, res) => {

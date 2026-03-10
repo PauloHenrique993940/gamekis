@@ -24,4 +24,9 @@ export const getRanking = async () => {
   return response.data;
 };
 
+export const getStatus = async () => {
+  const response = await api.get('/status');
+  return response.data;
+};
+
 export default api;

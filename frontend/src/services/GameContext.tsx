@@ -24,26 +24,39 @@ interface GameContextType {
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
-  const [player, setPlayerState] = useState<Player | null>(null);
-  const [currentLevel, setCurrentLevel] = useState<number>(1);
+  const [player, setPlayerState] = useState<Player | null>(() => {
+    const savedPlayer = localStorage.getItem('gamekis_player');
+    if (savedPlayer) return JSON.parse(savedPlayer);
+    
+    // Criar jogador anônimo por padrão se não houver um
+    const anonymousPlayer: Player = {
+      id: 'anon-' + Math.random().toString(36).substr(2, 9),
+      name: 'Herói Anônimo',
+      totalScore: 0,
+      levelsCompleted: [],
+      badges: []
+    };
+    return anonymousPlayer;
+  });
+  
+  const [currentLevel, setCurrentLevel] = useState<number>(() => {
+    const savedLevel = localStorage.getItem('gamekis_level');
+    if (savedLevel) return parseInt(savedLevel);
+    
+    const savedPlayer = localStorage.getItem('gamekis_player');
+    if (savedPlayer) {
+      const p = JSON.parse(savedPlayer);
+      if (p.levelsCompleted && p.levelsCompleted.length > 0) {
+        const nextLevel = Math.max(...p.levelsCompleted) + 1;
+        return nextLevel > 3 ? 3 : nextLevel;
+      }
+    }
+    return 1;
+  });
 
   // Carregar dados salvos ao iniciar
   useEffect(() => {
-    const savedPlayer = localStorage.getItem('gamekis_player');
-    const savedLevel = localStorage.getItem('gamekis_level');
-    
-    if (savedPlayer) {
-      const p = JSON.parse(savedPlayer);
-      setPlayerState(p);
-      
-      // Se já completou níveis, define o nível atual como o próximo disponível
-      if (savedLevel) {
-        setCurrentLevel(parseInt(savedLevel));
-      } else if (p.levelsCompleted && p.levelsCompleted.length > 0) {
-        const nextLevel = Math.max(...p.levelsCompleted) + 1;
-        setCurrentLevel(nextLevel > 3 ? 3 : nextLevel);
-      }
-    }
+    // A inicialização agora é feita diretamente no useState
   }, []);
 
   const setPlayer = (p: Player | null) => {
@@ -79,6 +92,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useGame = () => {
   const context = useContext(GameContext);
   if (!context) throw new Error('useGame must be used within a GameProvider');

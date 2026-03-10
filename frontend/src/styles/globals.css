@@ -1,29 +1,35 @@
 :root {
-  --primary: #e62429; /* Red */
-  --secondary: #002d62; /* Blue */
-  --accent: #00d2ff; /* Cyan/Neon */
-  --dark: #121212;
-  --darker: #050505;
+  --primary: #00d2ff; /* Cyan/Neon principal */
+  --secondary: #0044ff; /* Blue */
+  --accent: #fff; /* Prata/Branco */
+  --dark: #12121c;
+  --darker: #050508;
   --white: #ffffff;
-  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+  --danger: #e62429;
+  --shadow: 0 0 20px rgba(0, 210, 255, 0.3);
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
 }
 
 body {
-  background-color: #050505;
+  background-color: var(--darker);
   color: var(--white);
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
+  /* Grade sutil de fundo em todo o site */
+  background-image: 
+    linear-gradient(rgba(0, 210, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 210, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
 }
 
-/* Efeito de Buraco Negro encapsulado em uma classe */
+/* Efeito de Buraco Negro */
 .black-hole-container {
   position: fixed;
   top: 0;
@@ -32,22 +38,22 @@ body {
   height: 100%;
   z-index: -1;
   overflow: hidden;
-  background: radial-gradient(circle at center, #1a0033 0%, #000 100%);
+  background: radial-gradient(circle at center, #0a0a1a 0%, #000 100%);
 }
 
 .black-hole {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 400px;
-  height: 400px;
+  width: 300px;
+  height: 300px;
   background: #000;
   border-radius: 50%;
   transform: translate(-50%, -50%);
   box-shadow: 
-    0 0 40px 10px #fff,
-    0 0 80px 30px var(--hole-color-primary, var(--primary)),
-    0 0 120px 60px var(--hole-color-secondary, var(--secondary));
+    0 0 20px 5px #fff,
+    0 0 60px 20px var(--hole-color-primary, var(--primary)),
+    0 0 100px 40px var(--hole-color-secondary, var(--secondary));
   animation: blackHolePulse 6s infinite ease-in-out;
 }
 
@@ -55,24 +61,24 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 700px;
-  height: 150px;
-  background: linear-gradient(90deg, transparent, var(--hole-color-primary, var(--accent)), var(--hole-color-secondary, var(--primary)), transparent);
+  width: 600px;
+  height: 120px;
+  background: linear-gradient(90deg, transparent, var(--hole-color-primary, var(--primary)), var(--hole-color-secondary, var(--secondary)), transparent);
   border-radius: 50%;
   transform: translate(-50%, -50%) rotateX(75deg);
-  opacity: 0.5;
-  filter: blur(15px);
-  animation: rotateDisk 10s infinite linear;
+  opacity: 0.4;
+  filter: blur(12px);
+  animation: rotateDisk 15s infinite linear;
 }
 
-/* Variações por Nível */
-.level-1 { --hole-color-primary: #e62429; --hole-color-secondary: #002d62; }
-.level-2 { --hole-color-primary: #00d2ff; --hole-color-secondary: #002d62; }
-.level-3 { --hole-color-primary: #ff00ff; --hole-color-secondary: #e62429; }
+/* Variações de Cores por Nível */
+.level-1 { --hole-color-primary: #00d2ff; --hole-color-secondary: #0044ff; }
+.level-2 { --hole-color-primary: #00ff88; --hole-color-secondary: #0088ff; }
+.level-3 { --hole-color-primary: #ff00ff; --hole-color-secondary: #00d2ff; }
 
 @keyframes blackHolePulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50%) scale(1.15); }
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
 }
 
 @keyframes rotateDisk {
@@ -80,79 +86,100 @@ body {
   to { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); }
 }
 
-/* Scrollbar Style */
+/* Scrollbar Style Gamer */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
   background: var(--darker);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--primary);
+  border-radius: 10px;
+  box-shadow: 0 0 10px var(--primary);
+}
+
+/* Botão Estilo Gamer */
+.hero-btn {
+  background: rgba(0, 210, 255, 0.1);
+  color: white;
+  border: 1px solid var(--primary);
+  padding: 14px 28px;
+  font-weight: 900;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   border-radius: 4px;
 }
 
-.hero-btn {
+.hero-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
   background: var(--primary);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
-  box-shadow: 0 0 15px rgba(230, 36, 41, 0.5);
+  z-index: -1;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s ease;
+  border-radius: 2px;
 }
 
 .hero-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 25px var(--primary);
-  background: #ff2e35;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px var(--primary);
+  color: #000;
+}
+
+.hero-btn:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 .hero-btn:active {
   transform: scale(0.95);
 }
 
+/* Card Gamer */
 .card {
-  background: rgba(18, 18, 18, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: var(--shadow);
+  background: rgba(18, 18, 28, 0.85);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 210, 255, 0.2);
+  border-radius: 15px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 20px rgba(0, 210, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
 }
 
 .neon-text {
   color: var(--white);
-  text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
+  text-shadow: 0 0 8px var(--primary);
+  font-weight: 900;
+  letter-spacing: 1px;
 }
 
-.glow-border {
-  border: 2px solid var(--primary);
-  box-shadow: 0 0 10px var(--primary), inset 0 0 5px var(--primary);
+/* Animations Global */
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+  20%, 22%, 24%, 55% { opacity: 0.5; }
 }
 
-/* Animations */
 @keyframes float {
-  0% { transform: translateY(0px); }
+  0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
-}
-
-@keyframes pulse {
-  0% { opacity: 0.8; }
-  50% { opacity: 1; }
-  100% { opacity: 0.8; }
-}
-
-@keyframes glowPulse {
-  0% { box-shadow: 0 0 5px var(--primary); }
-  50% { box-shadow: 0 0 20px var(--primary); }
-  100% { box-shadow: 0 0 5px var(--primary); }
 }
