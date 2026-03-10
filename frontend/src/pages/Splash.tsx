@@ -4,10 +4,9 @@ import { Shield, Zap, Cpu } from 'lucide-react';
 
 const Splash = () => {
   const navigate = useNavigate();
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => setShow(true), 500);
     const timer = setTimeout(() => {
       navigate('/quiz');
     }, 4500);

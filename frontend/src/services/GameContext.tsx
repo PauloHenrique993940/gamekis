@@ -25,8 +25,13 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
   const [player, setPlayerState] = useState<Player | null>(() => {
-    const savedPlayer = localStorage.getItem('gamekis_player');
-    if (savedPlayer) return JSON.parse(savedPlayer);
+    try {
+      const savedPlayer = localStorage.getItem('gamekis_player');
+      if (savedPlayer) return JSON.parse(savedPlayer);
+    } catch (e) {
+      console.error("Erro ao ler player do localStorage", e);
+      localStorage.removeItem('gamekis_player');
+    }
     
     // Criar jogador anônimo por padrão se não houver um
     const anonymousPlayer: Player = {
@@ -40,16 +45,20 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   });
   
   const [currentLevel, setCurrentLevel] = useState<number>(() => {
-    const savedLevel = localStorage.getItem('gamekis_level');
-    if (savedLevel) return parseInt(savedLevel);
-    
-    const savedPlayer = localStorage.getItem('gamekis_player');
-    if (savedPlayer) {
-      const p = JSON.parse(savedPlayer);
-      if (p.levelsCompleted && p.levelsCompleted.length > 0) {
-        const nextLevel = Math.max(...p.levelsCompleted) + 1;
-        return nextLevel > 3 ? 3 : nextLevel;
+    try {
+      const savedLevel = localStorage.getItem('gamekis_level');
+      if (savedLevel) return parseInt(savedLevel);
+      
+      const savedPlayer = localStorage.getItem('gamekis_player');
+      if (savedPlayer) {
+        const p = JSON.parse(savedPlayer);
+        if (p.levelsCompleted && p.levelsCompleted.length > 0) {
+          const nextLevel = Math.max(...p.levelsCompleted) + 1;
+          return nextLevel > 3 ? 3 : nextLevel;
+        }
       }
+    } catch (e) {
+      console.error("Erro ao ler level do localStorage", e);
     }
     return 1;
   });
