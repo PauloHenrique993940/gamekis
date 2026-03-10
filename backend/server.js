@@ -1,56 +1,33 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { v4 as uuidv4 } from 'uuid';
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { PrismaClient } from '@prisma/client';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+const prisma = new PrismaClient();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(bodyParser.json());
 
-const DB_PATH = path.join(__dirname, 'players.json');
-const QUESTIONS_PATH = path.join(__dirname, 'questions.json');
-
-// Inicializar players.json se não existir
-async function initDB() {
-  try {
-    await fs.access(DB_PATH);
-  } catch {
-    await fs.writeFile(DB_PATH, JSON.stringify([]));
-  }
-}
-
-// Ler dados do arquivo
-async function readData(filePath) {
-  const data = await fs.readFile(filePath, 'utf-8');
-  return JSON.parse(data);
-}
-
-// Salvar dados no arquivo
-async function saveData(filePath, data) {
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-}
-
 // Rotas
 app.get('/questions', async (req, res) => {
   try {
-    const questions = await readData(QUESTIONS_PATH);
     const { level } = req.query;
     
-    if (level) {
-      const filtered = questions.filter(q => q.level === parseInt(level));
-      return res.json(filtered);
-    }
+    const questions = await prisma.question.findMany({
+      where: level ? { level: parseInt(level.toString()) } : undefined
+    });
+
+    // Converter string JSON das opções de volta para array
+    const formattedQuestions = questions.map(q => ({
+      ...q,
+      options: JSON.parse(q.options)
+    }));
     
-    res.json(questions);
+    res.json(formattedQuestions);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao carregar perguntas' });
   }
 });
@@ -62,81 +39,110 @@ app.post('/player', async (req, res) => {
       return res.status(400).json({ error: 'O nome do herói é obrigatório' });
     }
 
-    const players = await readData(DB_PATH);
-    // Busca se já existe um jogador com esse nome para "reentrar"
-    let player = players.find(p => p.name.toLowerCase() === name.toLowerCase());
+    // Busca ou cria o jogador
+    let player = await prisma.player.findUnique({
+      where: { name },
+      include: { badges: true }
+    });
 
     if (!player) {
-      player = {
-        id: uuidv4(),
-        name,
-        totalScore: 0,
-        levelsCompleted: [],
-        badges: [],
-        createdAt: new Date().toISOString()
-      };
-      players.push(player);
-      await saveData(DB_PATH, players);
+      player = await prisma.player.create({
+        data: {
+          name,
+          totalScore: 0,
+          levelsCompleted: '[]'
+        },
+        include: { badges: true }
+      });
     }
 
-    res.status(201).json(player);
+    // Formata o levelsCompleted de string para array para o front-end
+    const formattedPlayer = {
+      ...player,
+      levelsCompleted: JSON.parse(player.levelsCompleted)
+    };
+
+    res.status(201).json(formattedPlayer);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao cadastrar jogador' });
   }
 });
 
-// Remover rota de login e reset-password pois não há mais senha
-app.delete('/login', (req, res) => res.status(404).end());
-app.delete('/reset-password', (req, res) => res.status(404).end());
-
 app.post('/score', async (req, res) => {
   try {
     const { id, level, score, totalQuestions, badge } = req.body;
-    const players = await readData(DB_PATH);
-    const playerIndex = players.findIndex(p => p.id === id);
+    
+    const player = await prisma.player.findUnique({
+      where: { id },
+      include: { badges: true }
+    });
 
-    if (playerIndex === -1) {
+    if (!player) {
       return res.status(404).json({ error: 'Jogador não encontrado' });
     }
 
     const percentage = (score / totalQuestions) * 100;
+    const levelsCompleted = JSON.parse(player.levelsCompleted);
     
-    // Atualizar pontuação e níveis
-    players[playerIndex].totalScore += score;
+    // Atualizar dados
+    let newScore = player.totalScore + score;
+    let newLevels = [...levelsCompleted];
     
-    if (percentage >= 70) {
-      if (!players[playerIndex].levelsCompleted.includes(level)) {
-        players[playerIndex].levelsCompleted.push(level);
-        if (badge) {
-          players[playerIndex].badges.push({
+    if (percentage >= 70 && !newLevels.includes(level)) {
+      newLevels.push(level);
+      
+      // Se tiver insígnia, cria no banco
+      if (badge) {
+        await prisma.badge.create({
+          data: {
             name: badge,
             level,
-            date: new Date().toISOString()
-          });
-        }
+            playerId: id
+          }
+        });
       }
     }
 
-    await saveData(DB_PATH, players);
-    res.json(players[playerIndex]);
+    const updatedPlayer = await prisma.player.update({
+      where: { id },
+      data: {
+        totalScore: newScore,
+        levelsCompleted: JSON.stringify(newLevels)
+      },
+      include: { badges: true }
+    });
+
+    res.json({
+      ...updatedPlayer,
+      levelsCompleted: JSON.parse(updatedPlayer.levelsCompleted)
+    });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao salvar pontuação' });
   }
 });
 
 app.get('/ranking', async (req, res) => {
   try {
-    const players = await readData(DB_PATH);
-    const ranking = players
-      .sort((a, b) => b.totalScore - a.totalScore)
-      .slice(0, 10);
-    res.json(ranking);
+    const players = await prisma.player.findMany({
+      orderBy: { totalScore: 'desc' },
+      take: 10,
+      include: { badges: true }
+    });
+
+    const formattedRanking = players.map(p => ({
+      ...p,
+      levelsCompleted: JSON.parse(p.levelsCompleted)
+    }));
+
+    res.json(formattedRanking);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao carregar ranking' });
   }
 });
 
-app.listen(PORT, async () => {
-  await initDB();
-  console.log(`🚀 Servidor gameKis rodando em http://localhost:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor gameKis com Prisma rodando em http://localhost:${PORT}`);
 });

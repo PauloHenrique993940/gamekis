@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Player {
+  id              String   @id @default(uuid())
+  name            String   @unique
+  totalScore      Int      @default(0)
+  levelsCompleted String   @default("[]")
+  createdAt       DateTime @default(now())
+  badges          Badge[]
+}
+
+model Badge {
+  id       String   @id @default(uuid())
+  name     String
+  level    Int
+  date     DateTime @default(now())
+  playerId String
+  player   Player   @relation(fields: [playerId], references: [id])
+}
+
+model Question {
+  id          String @id @default(uuid())
+  level       Int
+  category    String @default("Geral")
+  question    String
+  options     String
+  answer      Int
+  explanation String @default("")
+}
